@@ -8,6 +8,17 @@ package Point_of_Sales_Systems;
 import java.awt.event.KeyEvent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.*;
+import java.sql.PreparedStatement;
+import java.text.MessageFormat;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
 
 
 /**
@@ -20,8 +31,22 @@ public class Point_of_Sales_System extends javax.swing.JFrame {
     /**
      * Creates new form Point_of_Sales_System
      */
+    
+    Connection conn = null;
+    PreparedStatement pst = null;
+    ResultSet rs = null;
+    DefaultTableModel model = new DefaultTableModel();
+    
     public Point_of_Sales_System() {
         initComponents();
+        
+        conn = Point_of_Sales_System.ConnectDb();
+        
+        Object col[] = {"Name", "Tax", "Subtotal", "Total"};
+        model.setColumnIdentifiers(col);
+        jTable1.setModel(model);
+        
+        updateTable();
     }
 
     /**
@@ -448,14 +473,6 @@ public class Point_of_Sales_System extends javax.swing.JFrame {
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jtextTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jtextSubTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jbtnReset, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jbtnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jbtnTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jbtnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addGroup(jPanel3Layout.createSequentialGroup()
                             .addComponent(jlabelSubTotal2)
@@ -464,8 +481,16 @@ public class Point_of_Sales_System extends javax.swing.JFrame {
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
                             .addComponent(jlabelSubTotal1)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jtextCakeType, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(39, Short.MAX_VALUE))
+                            .addComponent(jtextCakeType, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jbtnTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jbtnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jbtnReset, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jbtnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(55, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -491,7 +516,7 @@ public class Point_of_Sales_System extends javax.swing.JFrame {
                     .addComponent(jlabelTotal)
                     .addComponent(jtextTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 316, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jbtnTotal)
@@ -500,7 +525,7 @@ public class Point_of_Sales_System extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jbtnReset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jbtnExit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(6, 6, 6))
+                .addGap(5, 5, 5))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
@@ -1203,10 +1228,10 @@ public class Point_of_Sales_System extends javax.swing.JFrame {
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(41, 41, 41))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -1227,13 +1252,26 @@ public class Point_of_Sales_System extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 35, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    public static Connection ConnectDb(){
+        try
+        {
+            Class.forName("org.sqlite.JDBC");
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:Cake.db");
+            return conn;
+        }
+        catch(Exception e)
+        {
+            JOptionPane.showMessageDialog(null, e);
+            return null;
+        }
+    }
     private void jcheckboxChocolateStrawberryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcheckboxChocolateStrawberryActionPerformed
         // TODO add your handling code here:
         jtextfieldChocolateStrawberry.setEnabled(true);
@@ -1934,8 +1972,57 @@ private JFrame frame;
         String Total = String.format("$%.2f", iTotal);
         jtextTotal.setText(Total);
         
+        String sql = "INSERT INTO Cake(Name, Tax, Subtotal, Total)VALUES(?,?,?,?)";
+        
+        try
+        {
+            pst = conn.prepareStatement(sql);
+            pst.setString(1, jtextName.getText());
+            pst.setString(2, jtextTax.getText());
+            pst.setString(3, jtextSubTotal.getText());
+            pst.setString(4, jtextTotal.getText());
+           
+            pst.execute();
+            JOptionPane.showMessageDialog(null, "System Update Completed");
+            
+            rs.close();
+            pst.close();
+        }
+        
+        catch(Exception e)
+        {
+            JOptionPane.showMessageDialog(null,e);
+        }
+        updateTable();
+        
     }//GEN-LAST:event_jbtnTotalActionPerformed
 
+    public void updateTable(){
+        conn = Point_of_Sales_System.ConnectDb();
+        if(conn != null)
+        {
+          String sql = "Select Name, Tax, Subtotal, Total from Cake";
+          
+          try
+          {
+             pst = conn.prepareStatement(sql);
+             rs = pst.executeQuery();
+             Object[] columnData = new Object[4];
+             
+             while (rs.next()){
+                 columnData[0] = rs.getString("Name");
+                 columnData[1] = rs.getString("Tax");
+                 columnData[2] = rs.getString("Subtotal");
+                 columnData[3] = rs.getString("Total");
+                 model.addRow(columnData);
+             }
+          }
+          catch(Exception e)
+             {
+            JOptionPane.showMessageDialog(null,e);
+             }
+        }
+    }
     private void jbtnChocolateKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jbtnChocolateKeyPressed
         // TODO add your handling code here:
     }//GEN-LAST:event_jbtnChocolateKeyPressed
@@ -2002,6 +2089,11 @@ private JFrame frame;
 
     private void jbtnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnClearActionPerformed
         // TODO add your handling code here:
+        jtextName.setText(null);
+        jtextCakeType.setText(null);
+        jtextTax.setText(null);
+        jtextSubTotal.setText(null);
+        jtextTotal.setText(null);
     }//GEN-LAST:event_jbtnClearActionPerformed
 
     private void jtextNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtextNameActionPerformed
